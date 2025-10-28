@@ -182,7 +182,7 @@ async def get_available_filters():
     """Get all available filter options from products"""
     try:
         # Fetch all products to extract unique filter values
-        response = wcapi.get("products", params={"per_page": 100, "status": "publish"})
+        response = wcapi.get("products", params={"per_page": 100, "status": "any"})
         
         if response.status_code != 200:
             return {"genres": [], "moods": [], "keys": [], "bpm_range": {"min": 60, "max": 200}}
