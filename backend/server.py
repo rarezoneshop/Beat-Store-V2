@@ -86,7 +86,7 @@ async def get_products(
         params = {
             "per_page": per_page,
             "page": page,
-            "status": "publish"
+            "status": "any"
         }
         
         # Fetch products from WooCommerce
