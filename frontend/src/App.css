@@ -37,9 +37,36 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
 }
 
+/* Row Layout Styles */
+.beat-row {
+  position: relative;
+  transition: background 0.2s;
+}
+
+.beat-row.playing {
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.beat-row.playing::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, #3b82f6, #60a5fa);
+}
+
 .waveform-bar {
   background: linear-gradient(to top, #3b82f6, #60a5fa);
   border-radius: 2px;
+  animation: wave 0.8s ease-in-out infinite;
+}
+
+.waveform-bar-small {
+  width: 2px;
+  background: linear-gradient(to top, #3b82f6, #60a5fa);
+  border-radius: 1px;
   animation: wave 0.8s ease-in-out infinite;
 }
 
@@ -75,6 +102,17 @@ h1, h2, h3, h4, h5, h6 {
   color: #fff;
 }
 
+.filter-badge-small {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #60a5fa;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  display: inline-block;
+}
+
 .player-control-btn {
   width: 40px;
   height: 40px;
@@ -95,6 +133,28 @@ h1, h2, h3, h4, h5, h6 {
 
 .player-control-btn:active {
   transform: scale(0.95);
+}
+
+.player-control-btn-small {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.player-control-btn-small:hover {
+  background: rgba(59, 130, 246, 0.3);
+  transform: scale(1.1);
+}
+
+.player-control-btn-small:active {
+  transform: scale(0.9);
 }
 
 .player-control-btn.play {
