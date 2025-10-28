@@ -366,80 +366,105 @@ const BeatStore = () => {
           )}
         </div>
 
-        {/* Beat Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-32">
+        {/* Beat List */}
+        <div className="glass rounded-2xl overflow-hidden mb-32">
           {loading ? (
-            <div className="col-span-full text-center py-20 text-gray-400">Loading beats...</div>
+            <div className="text-center py-20 text-gray-400">Loading beats...</div>
           ) : filteredProducts.length === 0 ? (
-            <div className="col-span-full text-center py-20 text-gray-400">No beats found</div>
+            <div className="text-center py-20 text-gray-400">No beats found</div>
           ) : (
-            filteredProducts.map((product) => (
-              <div
-                key={product.id}
-                data-testid={`beat-card-${product.id}`}
-                className={`beat-card fade-in ${currentPlaying?.id === product.id && isPlaying ? 'playing' : ''}`}
-              >
-                {/* Beat Image */}
-                {product.images?.[0]?.src && (
-                  <img
-                    src={product.images[0].src}
-                    alt={product.name}
-                    className="w-full h-48 object-cover rounded-lg mb-4"
-                  />
-                )}
-                
-                {/* Beat Info */}
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold mb-1">{product.name}</h3>
-                    <div className="flex flex-wrap gap-2 text-xs text-gray-400">
-                      {product.genre && <span className="filter-badge">{product.genre}</span>}
-                      {product.bpm && <span className="filter-badge">{product.bpm} BPM</span>}
-                      {product.music_key && <span className="filter-badge">{product.music_key}</span>}
-                      {product.mood && <span className="filter-badge">{product.mood}</span>}
+            <div className="divide-y divide-white/10">
+              {filteredProducts.map((product, index) => (
+                <div
+                  key={product.id}
+                  data-testid={`beat-card-${product.id}`}
+                  className={`beat-row fade-in ${currentPlaying?.id === product.id && isPlaying ? 'playing' : ''}`}
+                >
+                  {/* Main Beat Info Row */}
+                  <div className="flex items-center gap-4 p-4 hover:bg-white/5 transition-colors">
+                    {/* Play Button & Index */}
+                    <div className="flex items-center gap-3 w-16">
+                      <span className="text-gray-500 text-sm w-6 text-right">{index + 1}</span>
+                      <button
+                        data-testid={`play-button-${product.id}`}
+                        onClick={() => playBeat(product)}
+                        className="player-control-btn-small"
+                        disabled={!product.audio_url}
+                      >
+                        {currentPlaying?.id === product.id && isPlaying ? (
+                          <Pause className="w-4 h-4 text-blue-400" />
+                        ) : (
+                          <Play className="w-4 h-4 text-blue-400 ml-0.5" />
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Beat Image & Name */}
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      {product.images?.[0]?.src && (
+                        <img
+                          src={product.images[0].src}
+                          alt={product.name}
+                          className="w-12 h-12 rounded object-cover"
+                        />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold truncate text-white">{product.name}</h3>
+                        {currentPlaying?.id === product.id && isPlaying && (
+                          <div className="flex items-center gap-1 mt-1">
+                            {[...Array(20)].map((_, i) => (
+                              <div
+                                key={i}
+                                className="waveform-bar-small"
+                                style={{
+                                  height: `${Math.random() * 12 + 4}px`,
+                                  animationDelay: `${i * 0.05}s`
+                                }}
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Genre */}
+                    <div className="hidden md:block w-32">
+                      {product.genre && (
+                        <span className="filter-badge-small">{product.genre}</span>
+                      )}
+                    </div>
+
+                    {/* BPM */}
+                    <div className="hidden lg:block w-24 text-sm text-gray-400">
+                      {product.bpm && `${product.bpm} BPM`}
+                    </div>
+
+                    {/* Key */}
+                    <div className="hidden lg:block w-20 text-sm text-gray-400">
+                      {product.music_key}
+                    </div>
+
+                    {/* Mood */}
+                    <div className="hidden xl:block w-28">
+                      {product.mood && (
+                        <span className="filter-badge-small">{product.mood}</span>
+                      )}
+                    </div>
+
+                    {/* License Dropdown */}
+                    <div className="w-40">
+                      <LicenseSelector 
+                        product={product} 
+                        toggleLicense={toggleLicense} 
+                        selectedLicenses={selectedLicenses} 
+                        addToCart={addToCart}
+                        compact={true}
+                      />
                     </div>
                   </div>
-                  
-                  <button
-                    data-testid={`play-button-${product.id}`}
-                    onClick={() => playBeat(product)}
-                    className="player-control-btn"
-                    disabled={!product.audio_url}
-                  >
-                    {currentPlaying?.id === product.id && isPlaying ? (
-                      <Pause className="w-5 h-5 text-blue-400" />
-                    ) : (
-                      <Play className="w-5 h-5 text-blue-400 ml-0.5" />
-                    )}
-                  </button>
                 </div>
-
-                {/* Waveform Visualization */}
-                {currentPlaying?.id === product.id && isPlaying && (
-                  <div className="flex items-center gap-1 h-12 mb-4">
-                    {[...Array(30)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="waveform-bar flex-1"
-                        style={{
-                          height: `${Math.random() * 80 + 20}%`,
-                          animationDelay: `${i * 0.05}s`
-                        }}
-                      />
-                    ))}
-                  </div>
-                )}
-
-                {/* Licenses */}
-                {product.variations && product.variations.length > 0 && (
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-400 mb-2">Select License:</p>
-                    {/* Fetch variations on demand */}
-                    <LicenseSelector product={product} toggleLicense={toggleLicense} selectedLicenses={selectedLicenses} addToCart={addToCart} />
-                  </div>
-                )}
-              </div>
-            ))
+              ))}
+            </div>
           )}
         </div>
       </div>
