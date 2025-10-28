@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-\"\"\"
+"""
 Quick script to add sample beat products to WooCommerce
 Run: python3 add_sample_products.py
-\"\"\"
+"""
 
 from woocommerce import API
 import os
