@@ -279,6 +279,156 @@ const BeatStore = () => {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Now Playing Header - iTunes Style */}
+        {currentPlaying && (
+          <div className="glass rounded-2xl p-6 mb-8 fade-in" data-testid="now-playing-header">
+            <div className="flex items-center gap-6">
+              {/* Artwork */}
+              <div className="flex-shrink-0">
+                {currentPlaying.images?.[0]?.src ? (
+                  <img
+                    src={currentPlaying.images[0].src}
+                    alt={currentPlaying.name}
+                    className="w-32 h-32 rounded-lg object-cover shadow-lg"
+                  />
+                ) : (
+                  <div className="w-32 h-32 rounded-lg bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center">
+                    <Play className="w-12 h-12 text-blue-400" />
+                  </div>
+                )}
+              </div>
+
+              {/* Track Info & Controls */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Now Playing</p>
+                    <h2 className="text-2xl font-bold mb-2 truncate" data-testid="header-track-title">
+                      {currentPlaying.name}
+                    </h2>
+                    <div className="flex flex-wrap items-center gap-3 text-sm text-gray-400">
+                      {currentPlaying.genre && (
+                        <span className="flex items-center gap-1">
+                          <span className="filter-badge-small">{currentPlaying.genre}</span>
+                        </span>
+                      )}
+                      {currentPlaying.bpm && <span>{currentPlaying.bpm} BPM</span>}
+                      {currentPlaying.music_key && <span>Key: {currentPlaying.music_key}</span>}
+                      {currentPlaying.mood && (
+                        <span className="filter-badge-small">{currentPlaying.mood}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Share Buttons */}
+                  <div className="flex items-center gap-2 ml-4">
+                    <button
+                      data-testid="share-facebook"
+                      className="player-control-btn-small"
+                      title="Share on Facebook"
+                      onClick={() => {
+                        const url = encodeURIComponent(window.location.href);
+                        window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+                      }}
+                    >
+                      <svg className="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                      </svg>
+                    </button>
+                    <button
+                      data-testid="share-twitter"
+                      className="player-control-btn-small"
+                      title="Share on Twitter"
+                      onClick={() => {
+                        const text = encodeURIComponent(`Check out ${currentPlaying.name} on RareBeats!`);
+                        const url = encodeURIComponent(window.location.href);
+                        window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+                      }}
+                    >
+                      <svg className="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                      </svg>
+                    </button>
+                    <button
+                      data-testid="copy-link"
+                      className="player-control-btn-small"
+                      title="Copy Link"
+                      onClick={() => {
+                        navigator.clipboard.writeText(window.location.href);
+                        toast.success('Link copied to clipboard!');
+                      }}
+                    >
+                      <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Player Controls */}
+                <div className="flex items-center gap-4">
+                  <button
+                    data-testid="header-skip-back"
+                    onClick={() => skipTrack('prev')}
+                    className="player-control-btn-small"
+                  >
+                    <SkipBack className="w-4 h-4 text-blue-400" />
+                  </button>
+                  
+                  <button
+                    data-testid="header-play-pause"
+                    onClick={() => playBeat(currentPlaying)}
+                    className="player-control-btn play"
+                  >
+                    {isPlaying ? (
+                      <Pause className="w-6 h-6 text-white" />
+                    ) : (
+                      <Play className="w-6 h-6 text-white ml-0.5" />
+                    )}
+                  </button>
+                  
+                  <button
+                    data-testid="header-skip-forward"
+                    onClick={() => skipTrack('next')}
+                    className="player-control-btn-small"
+                  >
+                    <SkipForward className="w-4 h-4 text-blue-400" />
+                  </button>
+
+                  {/* Progress Bar */}
+                  <div className="flex-1 flex items-center gap-3">
+                    <span className="text-xs text-gray-400 min-w-[35px]" data-testid="header-current-time">
+                      {formatTime(currentTime)}
+                    </span>
+                    <div className="flex-1 progress-bar" onClick={handleProgressClick}>
+                      <div
+                        className="progress-fill"
+                        style={{ width: `${(currentTime / duration) * 100}%` }}
+                      />
+                    </div>
+                    <span className="text-xs text-gray-400 min-w-[35px]" data-testid="header-duration">
+                      {formatTime(duration)}
+                    </span>
+                  </div>
+
+                  {/* Volume Control */}
+                  <div className="flex items-center gap-2 w-32">
+                    <Volume2 className="w-4 h-4 text-gray-400" />
+                    <Slider
+                      data-testid="header-volume-slider"
+                      value={[volume * 100]}
+                      onValueChange={([val]) => setVolume(val / 100)}
+                      max={100}
+                      step={1}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Filters */}
         <div className="glass rounded-2xl p-6 mb-8 fade-in">
           <div className="flex items-center gap-2 mb-4">
