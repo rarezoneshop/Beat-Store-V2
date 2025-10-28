@@ -14,8 +14,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+// Support both external and WordPress hosting
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || window.REACT_APP_BACKEND_URL || '';
+const API = BACKEND_URL.includes('/wp-json/') ? BACKEND_URL : `${BACKEND_URL}/api`;
 
 const BeatStore = () => {
   const [products, setProducts] = useState([]);
