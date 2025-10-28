@@ -3,7 +3,7 @@
  * Plugin Name: RareBeats Player - Self Contained
  * Plugin URI: https://rarebeats.co.uk
  * Description: Complete beat player/store running entirely within WordPress. No external hosting required.
- * Version: 2.0.0
+ * Version: 2.0.1
  * Author: RareBeats
  * Author URI: https://rarebeats.co.uk
  * License: GPL2
