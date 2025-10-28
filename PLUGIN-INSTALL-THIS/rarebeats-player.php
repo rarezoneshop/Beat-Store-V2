@@ -488,14 +488,76 @@ class RareBeats_Self_Contained {
             'height' => '800px',
         ), $atts);
         
+        // Enqueue assets immediately when shortcode is called
+        $this->enqueue_player_assets();
+        
         ob_start();
         ?>
-        <div id="rarebeats-player-root" style="height: <?php echo esc_attr($atts['height']); ?>; width: 100%;"></div>
-        <script>
+        <div id="rarebeats-player-root" class="rarebeats-container" style="height: <?php echo esc_attr($atts['height']); ?>; width: 100%; position: relative; background: #0a0a0f;">
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #666; text-align: center;">
+                <p>Loading RareBeats Player...</p>
+            </div>
+        </div>
+        <script type="text/javascript">
             window.REACT_APP_BACKEND_URL = '<?php echo rest_url('rarebeats/v1'); ?>';
+            // Ensure React mounts after DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', function() {
+                    console.log('RareBeats: DOM ready, root element:', document.getElementById('rarebeats-player-root'));
+                });
+            } else {
+                console.log('RareBeats: Root element exists:', document.getElementById('rarebeats-player-root'));
+            }
         </script>
         <?php
         return ob_get_clean();
+    }
+    
+    /**
+     * Enqueue player assets for shortcode
+     */
+    private function enqueue_player_assets() {
+        static $assets_enqueued = false;
+        
+        if ($assets_enqueued) {
+            return;
+        }
+        
+        $assets_enqueued = true;
+        
+        // Find the actual CSS and JS files (hashed filenames)
+        $plugin_dir = plugin_dir_path(__FILE__);
+        $css_files = glob($plugin_dir . 'player/static/css/main.*.css');
+        $js_files = glob($plugin_dir . 'player/static/js/main.*.js');
+        
+        // Enqueue CSS if found
+        if (!empty($css_files)) {
+            $css_file = basename($css_files[0]);
+            wp_enqueue_style(
+                'rarebeats-player-css',
+                $this->plugin_url . 'player/static/css/' . $css_file,
+                array(),
+                '2.0.2'
+            );
+        }
+        
+        // Enqueue JS if found
+        if (!empty($js_files)) {
+            $js_file = basename($js_files[0]);
+            wp_enqueue_script(
+                'rarebeats-player-js',
+                $this->plugin_url . 'player/static/js/' . $js_file,
+                array(),
+                '2.0.2',
+                true  // Load in footer
+            );
+            
+            // Pass API URL to React
+            wp_localize_script('rarebeats-player-js', 'rarebeatsConfig', array(
+                'apiUrl' => rest_url('rarebeats/v1'),
+                'nonce' => wp_create_nonce('wp_rest')
+            ));
+        }
     }
     
     /**
