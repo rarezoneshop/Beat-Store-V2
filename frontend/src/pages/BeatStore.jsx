@@ -639,9 +639,10 @@ const BeatStore = () => {
 };
 
 // Component to fetch and display licenses
-const LicenseSelector = ({ product, toggleLicense, selectedLicenses, addToCart }) => {
+const LicenseSelector = ({ product, toggleLicense, selectedLicenses, addToCart, compact = false }) => {
   const [variations, setVariations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showLicenses, setShowLicenses] = useState(false);
   
   useEffect(() => {
     const fetchVariations = async () => {
@@ -662,9 +663,53 @@ const LicenseSelector = ({ product, toggleLicense, selectedLicenses, addToCart }
     }
   }, [product.id, product.variations]);
   
-  if (loading) return <div className="text-xs text-gray-400">Loading licenses...</div>;
+  if (loading) return <div className="text-xs text-gray-400">Loading...</div>;
   if (variations.length === 0) return null;
   
+  // Compact version for row layout
+  if (compact) {
+    const selectedVariation = variations.find(v => selectedLicenses[`${product.id}-${v.id}`]);
+    
+    return (
+      <div className="relative">
+        <Select
+          value={selectedVariation ? `${selectedVariation.id}` : ""}
+          onValueChange={(value) => {
+            const variation = variations.find(v => v.id.toString() === value);
+            if (variation) {
+              const key = `${product.id}-${variation.id}`;
+              // Clear other selections for this product
+              Object.keys(selectedLicenses).forEach(k => {
+                if (k.startsWith(`${product.id}-`)) {
+                  toggleLicense(product.id, variations.find(v => k === `${product.id}-${v.id}`));
+                }
+              });
+              // Toggle selected
+              toggleLicense(product.id, variation);
+              // Auto add to cart
+              setTimeout(() => addToCart(product, variation), 100);
+            }
+          }}
+        >
+          <SelectTrigger className="bg-white/5 border-white/10 text-white h-9 text-sm">
+            <SelectValue placeholder="Select License" />
+          </SelectTrigger>
+          <SelectContent>
+            {variations.map((variation) => {
+              const licenseName = variation.attributes?.[0]?.option || 'License';
+              return (
+                <SelectItem key={variation.id} value={variation.id.toString()}>
+                  {licenseName} - £{variation.price}
+                </SelectItem>
+              );
+            })}
+          </SelectContent>
+        </Select>
+      </div>
+    );
+  }
+  
+  // Original expanded version
   return (
     <div className="space-y-2">
       {variations.map((variation) => {
