@@ -445,27 +445,39 @@ class RareBeats_Self_Contained {
             return;
         }
         
-        // Enqueue React player
-        wp_enqueue_style(
-            'rarebeats-player-css',
-            $this->plugin_url . 'player/static/css/main.css',
-            array(),
-            '2.0.0'
-        );
+        // Find the actual CSS and JS files (hashed filenames)
+        $plugin_dir = plugin_dir_path(__FILE__);
+        $css_files = glob($plugin_dir . 'player/static/css/main.*.css');
+        $js_files = glob($plugin_dir . 'player/static/js/main.*.js');
         
-        wp_enqueue_script(
-            'rarebeats-player-js',
-            $this->plugin_url . 'player/static/js/main.js',
-            array(),
-            '2.0.0',
-            true
-        );
+        // Enqueue CSS if found
+        if (!empty($css_files)) {
+            $css_file = basename($css_files[0]);
+            wp_enqueue_style(
+                'rarebeats-player-css',
+                $this->plugin_url . 'player/static/css/' . $css_file,
+                array(),
+                '2.0.1'
+            );
+        }
         
-        // Pass API URL to React
-        wp_localize_script('rarebeats-player-js', 'rarebeatsConfig', array(
-            'apiUrl' => rest_url('rarebeats/v1'),
-            'nonce' => wp_create_nonce('wp_rest')
-        ));
+        // Enqueue JS if found
+        if (!empty($js_files)) {
+            $js_file = basename($js_files[0]);
+            wp_enqueue_script(
+                'rarebeats-player-js',
+                $this->plugin_url . 'player/static/js/' . $js_file,
+                array(),
+                '2.0.1',
+                true
+            );
+            
+            // Pass API URL to React
+            wp_localize_script('rarebeats-player-js', 'rarebeatsConfig', array(
+                'apiUrl' => rest_url('rarebeats/v1'),
+                'nonce' => wp_create_nonce('wp_rest')
+            ));
+        }
     }
     
     /**
